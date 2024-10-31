@@ -8,7 +8,7 @@ public class Prueba : MonoBehaviour
 
         //Comentario de prueba
 
-        Debud.Log("PruebaRama")
+        Debug.Log("PruebaRama");
 
     }
 
