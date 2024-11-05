@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     //Components
     private CharacterController characterController;
     private Transform cameraTransform;
+    private WeaponController weaponController;
 
     //Movement and Jump configuration parameters
     [Header("PlayerConfiguration")]
@@ -34,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         cameraTransform = Camera.main.transform;
-
+        weaponController = GetComponent<WeaponController>();
 
         //Hide Mouse Cursor
         Cursor.lockState = CursorLockMode.Locked;
@@ -92,6 +93,15 @@ public class PlayerMovement : MonoBehaviour
     {
         //When action started or maintained
         isSprinting = context.started || context.performed;
+    }
+
+    /// <summary>
+    /// When the player is avaible to shoot, then shoot
+    /// </summary>
+    /// <param name="context"></param>
+    public void Shoot(InputAction.CallbackContext context)
+    {
+        if (weaponController.CanShoot()) weaponController.Shoot();
     }
 
     /// <summary>
