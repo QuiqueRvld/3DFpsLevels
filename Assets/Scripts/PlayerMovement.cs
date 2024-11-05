@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviour
 {
     //Components
@@ -26,10 +26,20 @@ public class PlayerMovement : MonoBehaviour
 
     //Is Sprinting
     private bool isSprinting;
+    private bool isMoving;
 
     //Camera look sensitivity and max angle to limitvertical rotation
     [SerializeField] private float lookSensitivity = 0.5f;
     private float maxLookAngle = 80f;
+
+    //Stamina 
+    [SerializeField] private float maxStamina = 100f;
+    [SerializeField] private float staminaDrainRate = 10f;
+    [SerializeField] private float staminaRegenRate = 5f;
+    private float currentStamina;
+
+    //Reference o the slider
+    [SerializeField] private Slider staminaBar;
 
     private void Start()
     {
@@ -39,6 +49,15 @@ public class PlayerMovement : MonoBehaviour
 
         //Hide Mouse Cursor
         Cursor.lockState = CursorLockMode.Locked;
+
+        //Initialize the StaminaBar to max
+        currentStamina = maxStamina;
+
+        if (staminaBar != null)
+        {
+            staminaBar.maxValue = maxStamina;
+            staminaBar.value = currentStamina;
+        }
     }
 
 
@@ -46,8 +65,12 @@ public class PlayerMovement : MonoBehaviour
     {
         // Manage Player Movement 
         MovePlayer();
+
         // Manage Camera Rotation
         LookAround();
+
+        //Handle Stamina Bar
+        HandleStamina();
     }
 
     /// <summary>
@@ -57,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
-        Debug.Log(moveInput);
+        isMoving = moveInput != Vector2.zero;
     }
 
     /// <summary>
@@ -154,7 +177,30 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Handle Stamina bar
+    /// </summary>
+    private void HandleStamina()
+    {
+        if (isSprinting && isMoving && currentStamina > 0)
+        {
+            currentStamina -= staminaDrainRate * Time.deltaTime;
+            if (currentStamina <= 0) 
+            {
+                currentStamina = 0;
+                isSprinting = false;    
+            }
 
+        }
+        //Regenerate stamina
+        else if (!isSprinting && currentStamina < maxStamina)
+        {
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            currentStamina = Mathf.Min(currentStamina, maxStamina);
+        }
+        //Update stamina bar
+        staminaBar.value = currentStamina;
+    }
 
 
 }
